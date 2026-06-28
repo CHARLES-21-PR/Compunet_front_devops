@@ -22,5 +22,17 @@ export default defineConfig(({ mode }) => {
         }
       }
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          // Si el módulo viene de node_modules, lo separa en un chunk independiente
+          if (id.includes('node_modules')) {
+            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+          }
+        }
+      }
+    }
   }
 })
