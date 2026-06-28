@@ -59,12 +59,9 @@ function AdminDashboard() {
 
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem('token');
             const queryParams = new URLSearchParams(filters).toString();
-            const response = await fetch(`${apiBaseUrl}/api/dashboard?${queryParams}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
+            const response = await apiFetch(`${apiBaseUrl}/api/dashboard?${queryParams}`);
+
             if (!response.ok) return;
 
             const data = await response.json();

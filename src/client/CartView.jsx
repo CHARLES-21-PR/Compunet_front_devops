@@ -23,6 +23,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { getProductImageUrl } from '../utils/api';
 
 function CartView() {
     const { 
@@ -36,7 +37,6 @@ function CartView() {
         deselectAll 
     } = useCart();
     const navigate = useNavigate();
-    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
     const igv = selectedTotal * 0.18;
     const total = selectedTotal + igv;
@@ -51,11 +51,7 @@ function CartView() {
         }
     };
 
-    const getImageUrl = (image) => {
-        if (!image) return 'https://via.placeholder.com/150';
-        if (image.startsWith('http') || image.startsWith('data:')) return image;
-        return `${apiBaseUrl}/storage/products/${image}`;
-    };
+    const getImageUrl = (image) => getProductImageUrl(image);
 
     if (cartItems.length === 0) {
         return (

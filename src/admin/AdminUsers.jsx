@@ -28,6 +28,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import AdminLayout from './AdminLayout';
+import apiFetch from '../utils/api';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     head: {
@@ -55,6 +56,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function AdminUsers() {
     const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+    const getApiUrl = (endpoint) => {
+        if (!apiBaseUrl) {
+            throw new Error('VITE_API_URL / VITE_API_BASE_URL no está definido. Reinicia Vite y revisa tu archivo .env.');
+        }
+        return `${apiBaseUrl}${endpoint}`;
+    };
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -65,14 +72,13 @@ function AdminUsers() {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/users`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json'
-                }
-            });
-            if (!response.ok) throw new Error('Error al cargar usuarios');
+            const response = await apiFetch(getApiUrl('/api/users'));
+            
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error fetching users response body:', text);
+                throw new Error(`Error al cargar usuarios (${response.status})`);
+            }
             const data = await response.json();
             setUsers(Array.isArray(data) ? data : (data.data || []));
         } catch (error) {
@@ -113,16 +119,13 @@ function AdminUsers() {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
             const url = isEditing ? `${apiBaseUrl}/api/users/${currentUser.id}` : `${apiBaseUrl}/api/users`;
             const method = isEditing ? 'PUT' : 'POST';
 
-            const response = await fetch(url, {
-                method: method,
+            const response = await apiFetch(url, {
+                method,
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(currentUser)
             });
@@ -142,10 +145,8 @@ function AdminUsers() {
     const handleDelete = async (id) => {
         if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
             try {
-                const token = localStorage.getItem('token');
-const response = await fetch(`${apiBaseUrl}/api/users/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await apiFetch(`${apiBaseUrl}/api/users/${id}`, {
+                    method: 'DELETE'
                 });
 
                 if (!response.ok) throw new Error('Error al eliminar');

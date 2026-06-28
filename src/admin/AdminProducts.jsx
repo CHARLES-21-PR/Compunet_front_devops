@@ -37,6 +37,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import AdminLayout from './AdminLayout';
+import apiFetch, { getProductImageUrl } from '../utils/api';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     head: {
@@ -66,6 +67,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function AdminProducts() {
     const location = useLocation();
     const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
+    const getApiUrl = (endpoint) => {
+        if (!apiBaseUrl) {
+            throw new Error('VITE_API_URL / VITE_API_BASE_URL no está definido. Reinicia Vite y revisa tu archivo .env.');
+        }
+        return `${apiBaseUrl}${endpoint}`;
+    };
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -96,14 +103,12 @@ function AdminProducts() {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const authToken = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/products`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'accept': 'application/json',
-                }
-            });
-            if (!response.ok) throw new Error('Error al cargar productos');
+            const response = await apiFetch(getApiUrl('/api/products'));
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error fetching products response body:', text);
+                throw new Error(`Error al cargar productos (${response.status})`);
+            }
             const data = await response.json();
             setProducts(Array.isArray(data) ? data : (data.data || []));
             setError(null);
@@ -116,17 +121,14 @@ function AdminProducts() {
 
     const fetchCategories = async () => {
         try {
-            const authToken = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/categories`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'accept': 'application/json'
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setCategories(Array.isArray(data) ? data : (data.data || []));
+            const response = await apiFetch(getApiUrl('/api/categories'));
+            if (!response.ok) {
+                const text = await response.text();
+                console.error('Error fetching categories response body:', text);
+                throw new Error(`Error al cargar categorías (${response.status})`);
             }
+            const data = await response.json();
+            setCategories(Array.isArray(data) ? data : (data.data || []));
         } catch (err) {
             console.error('Error fetching categories:', err);
         }
@@ -179,7 +181,6 @@ function AdminProducts() {
             // Pero si hay imagen, o es POST, es mejor usar FormData.
             // Laravel a veces tiene problemas con PUT y FormData, así que para editar con archivo se suele usar POST con _method: PUT
             
-            const authToken = localStorage.getItem('token');
             const formData = new FormData();
             
             formData.append('name', currentProduct.name);
@@ -192,6 +193,13 @@ function AdminProducts() {
 
             if (currentProduct.image instanceof File) {
                 formData.append('image', currentProduct.image);
+            } else if (currentProduct.image) {
+                console.warn('currentProduct.image is not a File:', currentProduct.image);
+            }
+
+            // Debug: verify FormData contents before sending
+            for (const entry of formData.entries()) {
+                console.log('formData entry:', entry[0], entry[1]);
             }
 
             let method = isEditing ? 'POST' : 'POST';
@@ -199,12 +207,8 @@ function AdminProducts() {
                 formData.append('_method', 'PUT');
             }
 
-            const response = await fetch(`${apiBaseUrl}${url.replace('/api', '/api')}`, {
+            const response = await apiFetch(url, {
                 method: method,
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Accept': 'application/json'
-                },
                 body: formData
             });
 
@@ -231,12 +235,8 @@ function AdminProducts() {
         if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
 
         try {
-            const authToken = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/products/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                }
+            const response = await apiFetch(`${apiBaseUrl}/api/products/${id}`, {
+                method: 'DELETE'
             });
 
             if (!response.ok) throw new Error('Error al eliminar el producto');
@@ -354,7 +354,7 @@ function AdminProducts() {
                                         <StyledTableCell component="th" scope="row">
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Avatar 
-                                                    src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : undefined} 
+                                                    src={getProductImageUrl(product.image)} 
                                                     variant="rounded"
                                                     sx={{ mr: 2, bgcolor: '#e3f2fd', color: '#1976d2' }}
                                                 >

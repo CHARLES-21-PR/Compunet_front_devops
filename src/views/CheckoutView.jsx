@@ -24,6 +24,7 @@ import {
     DialogTitle,
     DialogContentText
 } from '@mui/material';
+import apiFetch from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -87,19 +88,11 @@ function CheckoutView() {
                 total: total
             };
 
-            // Opcional: Si el usuario está logueado, enviar el token
-            const token = localStorage.getItem('token');
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            };
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-
-            const response = await fetch(`${apiBaseUrl}/api/orders`, {
+            const response = await apiFetch(`${apiBaseUrl}/api/orders`, {
                 method: 'POST',
-                headers: headers,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(orderData)
             });
 

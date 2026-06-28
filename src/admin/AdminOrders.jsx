@@ -94,13 +94,7 @@ function AdminOrders() {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/orders`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json'
-                }
-            });
+            const response = await apiFetch(`${apiBaseUrl}/api/orders`);
             if (!response.ok) throw new Error('Error al cargar pedidos');
             const data = await response.json();
             setOrders(Array.isArray(data) ? data : (data.data || []));
@@ -131,12 +125,7 @@ function AdminOrders() {
             if (paymentMethodFilter !== 'all') params.append('payment_method', paymentMethodFilter);
             if (searchTerm) params.append('search', searchTerm);
 
-            const response = await fetch(`${apiBaseUrl}/api/orders/export?${params.toString()}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
+            const response = await apiFetch(`${apiBaseUrl}/api/orders/export?${params.toString()}`, { method: 'GET' });
 
             if (response.ok) {
                 const blob = await response.blob();
@@ -193,10 +182,7 @@ function AdminOrders() {
             setOpenDialog(true);
         } else {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${apiBaseUrl}/api/orders/${order.id}`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await apiFetch(`${apiBaseUrl}/api/orders/${order.id}`);
                 if (!response.ok) throw new Error('Error al cargar detalles');
                 const data = await response.json();
                 setCurrentOrder(data);
@@ -219,13 +205,9 @@ function AdminOrders() {
 
     const handleSaveChanges = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/orders/${currentOrder.id}`, {
+            const response = await apiFetch(`${apiBaseUrl}/api/orders/${currentOrder.id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: currentOrder.status })
             });
 
@@ -245,13 +227,9 @@ function AdminOrders() {
     const handleValidateOrder = async (order) => {
         if (window.confirm(`¿Validar pago Yape para el pedido #${order.id}?`)) {
             try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`${apiBaseUrl}/api/orders/${order.id}`, {
+                const response = await apiFetch(`${apiBaseUrl}/api/orders/${order.id}`, {
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: 'Pagado' })
                 });
 
@@ -271,11 +249,7 @@ function AdminOrders() {
     const handleDeleteOrder = async (id) => {
         if (window.confirm('¿Estás seguro de eliminar este pedido?')) {
             try {
-                const token = localStorage.getItem('token');
-const response = await fetch(`${apiBaseUrl}/api/orders/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
+                const response = await apiFetch(`${apiBaseUrl}/api/orders/${id}`, { method: 'DELETE' });
 
                 if (!response.ok) throw new Error('Error al eliminar');
 

@@ -36,6 +36,8 @@ import {
     Visibility as VisibilityIcon,
     FilterList as FilterListIcon
 } from '@mui/icons-material';
+import apiFetch, { getProductImageUrl } from '../utils/api';
+import ProductImage from '../components/ProductImage';
 
 function CategoryView() {
     const { name } = useParams();
@@ -74,27 +76,27 @@ function CategoryView() {
             setLoading(true);
             try {
                 // 1. Fetch Categories to find the current one
-                const catResponse = await fetch(`${apiBaseUrl}/api/categories`);
+                const catResponse = await apiFetch(`${apiBaseUrl}/api/categories`);
                 if (!catResponse.ok) throw new Error('Error al cargar categorías');
                 const catData = await catResponse.json();
                 const categories = Array.isArray(catData) ? catData : (catData.data || []);
-                
+
                 const foundCategory = categories.find(c => c.name.toLowerCase() === name.toLowerCase());
-                
+
                 if (!foundCategory) {
                     setCategory(null);
                     setLoading(false);
                     return;
                 }
-                
+
                 setCategory(foundCategory);
 
                 // 2. Fetch Products
-                const prodResponse = await fetch(`${apiBaseUrl}/api/products`);
+                const prodResponse = await apiFetch(`${apiBaseUrl}/api/products`);
                 if (!prodResponse.ok) throw new Error('Error al cargar productos');
                 const prodData = await prodResponse.json();
                 const allProducts = Array.isArray(prodData) ? prodData : (prodData.data || []);
-                
+
                 // Filter products for this category
                 const categoryProducts = allProducts.filter(p => p.category_id === foundCategory.id);
                 setProducts(categoryProducts);
@@ -103,10 +105,9 @@ function CategoryView() {
                 // Extract unique brands and colors
                 const uniqueBrands = [...new Set(categoryProducts.map(p => String(p.brand || '').trim()).filter(Boolean))];
                 const uniqueColors = [...new Set(categoryProducts.map(p => String(p.color || '').trim()).filter(Boolean))];
-                
+
                 setBrands(uniqueBrands);
                 setColors(uniqueColors);
-                
             } catch (err) {
                 console.error(err);
             } finally {
@@ -374,10 +375,9 @@ function CategoryView() {
                                             )}
                                             
                                             <Box sx={{ position: 'relative', pt: '100%', overflow: 'hidden', bgcolor: '#fff' }}>
-                                                <CardMedia
-                                                    component="img"
+                                                <ProductImage
                                                     className="product-image"
-                                                    image={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
+                                                    image={product.image}
                                                     alt={product.name}
                                                     sx={{ 
                                                         position: 'absolute', 
@@ -534,9 +534,8 @@ function CategoryView() {
                         <CloseIcon />
                     </IconButton>
                     {selectedProduct && (
-                        <Box 
-                            component="img"
-                            src={selectedProduct.image ? `${apiBaseUrl}/storage/products/${selectedProduct.image}` : '/img/placeholder.png'}
+                        <ProductImage
+                            image={selectedProduct.image}
                             alt={selectedProduct.name}
                             sx={{
                                 maxWidth: '100%',

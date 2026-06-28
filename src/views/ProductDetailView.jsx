@@ -17,10 +17,11 @@ import {
     Breadcrumbs,
     Link,
     Card,
-    CardMedia,
     CardContent,
     Dialog
 } from '@mui/material';
+import apiFetch from '../utils/api';
+import ProductImage from '../components/ProductImage';
 import {
     Add as AddIcon,
     Remove as RemoveIcon,
@@ -51,7 +52,7 @@ function ProductDetailView() {
         const fetchProduct = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`${apiBaseUrl}/api/products/${id}`);
+                const response = await apiFetch(`${apiBaseUrl}/api/products/${id}`);
                 if (!response.ok) {
                     throw new Error('Producto no encontrado');
                 }
@@ -72,7 +73,7 @@ function ProductDetailView() {
         if (product) {
             const fetchRelated = async () => {
                 try {
-                    const response = await fetch(`${apiBaseUrl}/api/products`);
+                    const response = await apiFetch(`${apiBaseUrl}/api/products`);
                     if (response.ok) {
                         const data = await response.json();
                         const allProducts = Array.isArray(data) ? data : (data.data || []);
@@ -164,20 +165,22 @@ function ProductDetailView() {
                                     justifyContent: 'center'
                                 }}
                             >
-                                <Box 
-                                    component="img"
-                                    src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
+                                <ProductImage
+                                    image={product.image}
                                     alt={product.name}
+                                    onClick={() => setOpenImageDialog(true)}
                                     sx={{ 
-                                        maxWidth: '100%', 
-                                        maxHeight: '100%', 
+                                        position: 'absolute', 
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
                                         objectFit: 'contain',
                                         cursor: 'zoom-in'
                                     }}
-                                    onClick={() => setOpenImageDialog(true)}
                                 />
-                                
-                                <IconButton 
+
+                                <IconButton
                                     onClick={() => setOpenImageDialog(true)}
                                     sx={{ 
                                         position: 'absolute', 
@@ -352,9 +355,8 @@ function ProductDetailView() {
                                         onClick={() => navigate(`/product/${related.id}`)}
                                     >
                                         <Box sx={{ position: 'relative', pt: '100%', bgcolor: 'white' }}>
-                                            <CardMedia
-                                                component="img"
-                                                image={related.image ? `${apiBaseUrl}/storage/products/${related.image}` : '/img/placeholder.png'}
+                                            <ProductImage
+                                                image={related.image}
                                                 alt={related.name}
                                                 sx={{ 
                                                     position: 'absolute', 
@@ -422,9 +424,8 @@ function ProductDetailView() {
                         <CloseIcon />
                     </IconButton>
                     {product && (
-                            <Box 
-                            component="img"
-                            src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
+                            <ProductImage 
+                            image={product.image}
                             alt={product.name}
                             sx={{
                                 maxWidth: '100%',

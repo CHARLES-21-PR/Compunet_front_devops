@@ -32,6 +32,7 @@ import {
 import { styled } from '@mui/material/styles';
 import AdminLayout from './AdminLayout';
 import { useAuth } from '../context/AuthContext';
+import apiFetch from '../utils/api';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     head: {
@@ -72,12 +73,7 @@ function AdminCategories() {
     const fetchCategories = async () => {
         setLoading(true);
         try {
-            const authToken = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/categories`, {
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                }
-            });
+            const response = await apiFetch(`${apiBaseUrl}/api/categories`);
             if (!response.ok) throw new Error('Error al cargar categorías');
             const data = await response.json();
             setCategories(Array.isArray(data) ? data : (data.data || []));
@@ -115,14 +111,10 @@ function AdminCategories() {
             const url = isEditing ? `${apiBaseUrl}/api/categories/${currentCategory.id}` : `${apiBaseUrl}/api/categories`;
             const method = isEditing ? 'PUT' : 'POST';
             
-            const authToken = localStorage.getItem('token');
-
-            const response = await fetch(url, {
+            const response = await apiFetch(url, {
                 method: method,
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(currentCategory)
             });
@@ -150,12 +142,8 @@ function AdminCategories() {
         if (!window.confirm('¿Estás seguro de eliminar esta categoría?')) return;
 
         try {
-            const authToken = localStorage.getItem('token');
-            const response = await fetch(`${apiBaseUrl}/api/categories/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${authToken}`
-                }
+            const response = await apiFetch(`${apiBaseUrl}/api/categories/${id}`, {
+                method: 'DELETE'
             });
 
             if (!response.ok) throw new Error('Error al eliminar la categoría');

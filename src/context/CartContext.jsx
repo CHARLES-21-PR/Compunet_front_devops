@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { getProductImageUrl } from '../utils/api';
 
 const CartContext = createContext();
 
@@ -25,12 +26,7 @@ export const CartProvider = ({ children }) => {
         if (product.image_url) {
             image = product.image_url;
         } else if (product.image) {
-            if (product.image.startsWith('http') || product.image.startsWith('data:')) {
-                image = product.image;
-            } else {
-                // Asumimos que es una imagen del backend en storage
-                image = `${apiBaseUrl}/storage/products/${product.image}`;
-            }
+            image = getProductImageUrl(product.image);
         }
 
         const productWithImage = { ...product, image };
