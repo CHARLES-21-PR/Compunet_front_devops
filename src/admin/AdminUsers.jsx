@@ -54,6 +54,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function AdminUsers() {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -65,7 +66,7 @@ function AdminUsers() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/users', {
+            const response = await fetch(`${apiBaseUrl}/api/users`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -113,7 +114,7 @@ function AdminUsers() {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            const url = isEditing ? `/api/users/${currentUser.id}` : '/api/users';
+            const url = isEditing ? `${apiBaseUrl}/api/users/${currentUser.id}` : `${apiBaseUrl}/api/users`;
             const method = isEditing ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -142,7 +143,7 @@ function AdminUsers() {
         if (window.confirm('¿Estás seguro de eliminar este usuario?')) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/users/${id}`, {
+const response = await fetch(`${apiBaseUrl}/api/users/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

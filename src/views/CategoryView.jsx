@@ -40,6 +40,7 @@ import {
 function CategoryView() {
     const { name } = useParams();
     const navigate = useNavigate();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [category, setCategory] = useState(null);
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -73,7 +74,7 @@ function CategoryView() {
             setLoading(true);
             try {
                 // 1. Fetch Categories to find the current one
-                const catResponse = await fetch('/api/categories');
+                const catResponse = await fetch(`${apiBaseUrl}/api/categories`);
                 if (!catResponse.ok) throw new Error('Error al cargar categorías');
                 const catData = await catResponse.json();
                 const categories = Array.isArray(catData) ? catData : (catData.data || []);
@@ -89,7 +90,7 @@ function CategoryView() {
                 setCategory(foundCategory);
 
                 // 2. Fetch Products
-                const prodResponse = await fetch('/api/products');
+                const prodResponse = await fetch(`${apiBaseUrl}/api/products`);
                 if (!prodResponse.ok) throw new Error('Error al cargar productos');
                 const prodData = await prodResponse.json();
                 const allProducts = Array.isArray(prodData) ? prodData : (prodData.data || []);
@@ -376,7 +377,7 @@ function CategoryView() {
                                                 <CardMedia
                                                     component="img"
                                                     className="product-image"
-                                                    image={product.image ? `http://localhost:8000/storage/products/${product.image}` : '/img/placeholder.png'}
+                                                    image={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
                                                     alt={product.name}
                                                     sx={{ 
                                                         position: 'absolute', 
@@ -535,7 +536,7 @@ function CategoryView() {
                     {selectedProduct && (
                         <Box 
                             component="img"
-                            src={selectedProduct.image ? `http://localhost:8000/storage/products/${selectedProduct.image}` : '/img/placeholder.png'}
+                            src={selectedProduct.image ? `${apiBaseUrl}/storage/products/${selectedProduct.image}` : '/img/placeholder.png'}
                             alt={selectedProduct.name}
                             sx={{
                                 maxWidth: '100%',

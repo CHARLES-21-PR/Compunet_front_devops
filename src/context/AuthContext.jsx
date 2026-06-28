@@ -5,7 +5,9 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+
 export const AuthProvider = ({ children }) => {
+    const urlBase = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('token'));
     const navigate = useNavigate();
@@ -13,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     // Verificar si hay sesión al cargar
     useEffect(() => {
         if (token) {
-            // Opcional: Aquí podrías hacer un fetch a /api/user para validar el token
+            // Opcional: Aquí podrías hacer un fetch a ${urlBase}/api/user para validar el token
             // Por ahora asumimos que si hay token, hay sesión.
             setUser({ 
                 name: localStorage.getItem('userName') || 'Usuario',
@@ -26,7 +28,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             // Usamos ruta relativa para aprovechar el proxy de Vite
-            const response = await fetch('/api/login', {
+            const response = await fetch(`${urlBase}/api/login`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (name, email, password) => {
         try {
-            const response = await fetch('/api/register', {
+            const response = await fetch(`${urlBase}/api/register`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -139,7 +141,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             // Intentar cerrar sesión en el servidor
-            await fetch('/api/logout', {
+            await fetch(`${urlBase}/api/logout`, {
                 method: 'POST',
                 headers: { 
                     'Authorization': `Bearer ${token}`,

@@ -65,6 +65,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 function AdminProducts() {
     const location = useLocation();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -96,9 +97,10 @@ function AdminProducts() {
         setLoading(true);
         try {
             const authToken = localStorage.getItem('token');
-            const response = await fetch('/api/products', {
+            const response = await fetch(`${apiBaseUrl}/api/products`, {
                 headers: {
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'accept': 'application/json',
                 }
             });
             if (!response.ok) throw new Error('Error al cargar productos');
@@ -115,9 +117,10 @@ function AdminProducts() {
     const fetchCategories = async () => {
         try {
             const authToken = localStorage.getItem('token');
-            const response = await fetch('/api/categories', {
+            const response = await fetch(`${apiBaseUrl}/api/categories`, {
                 headers: {
-                    'Authorization': `Bearer ${authToken}`
+                    'Authorization': `Bearer ${authToken}`,
+                    'accept': 'application/json'
                 }
             });
             if (response.ok) {
@@ -171,7 +174,7 @@ function AdminProducts() {
 
     const handleSave = async () => {
         try {
-            const url = isEditing ? `/api/products/${currentProduct.id}` : '/api/products';
+            const url = isEditing ? `${apiBaseUrl}/api/products/${currentProduct.id}` : `${apiBaseUrl}/api/products`;
             // Si estamos editando y no hay nueva imagen, podemos usar PUT con JSON
             // Pero si hay imagen, o es POST, es mejor usar FormData.
             // Laravel a veces tiene problemas con PUT y FormData, así que para editar con archivo se suele usar POST con _method: PUT
@@ -196,7 +199,7 @@ function AdminProducts() {
                 formData.append('_method', 'PUT');
             }
 
-            const response = await fetch(url, {
+            const response = await fetch(`${apiBaseUrl}${url.replace('/api', '/api')}`, {
                 method: method,
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
@@ -229,7 +232,7 @@ function AdminProducts() {
 
         try {
             const authToken = localStorage.getItem('token');
-            const response = await fetch(`/api/products/${id}`, {
+            const response = await fetch(`${apiBaseUrl}/api/products/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authToken}`
@@ -351,7 +354,7 @@ function AdminProducts() {
                                         <StyledTableCell component="th" scope="row">
                                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                 <Avatar 
-                                                    src={product.image ? `http://localhost:8000/storage/products/${product.image}` : undefined} 
+                                                    src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : undefined} 
                                                     variant="rounded"
                                                     sx={{ mr: 2, bgcolor: '#e3f2fd', color: '#1976d2' }}
                                                 >

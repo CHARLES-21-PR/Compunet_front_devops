@@ -46,6 +46,7 @@ function Nav() {
     const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
     const [mobileOpen, setMobileOpen] = useState(false);
     const [mobileSubmenus, setMobileSubmenus] = useState({});
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
     const open = Boolean(anchorEl);
     const notifOpen = Boolean(notifAnchorEl);
@@ -85,8 +86,8 @@ function Nav() {
             };
 
             const [ordersRes, productsRes] = await Promise.all([
-                fetch('/api/orders', { headers }),
-                fetch('/api/products', { headers })
+                fetch(`${apiBaseUrl}/api/orders`, { headers }),
+                fetch(`${apiBaseUrl}/api/products`, { headers })
             ]);
 
             const newNotifications = [];

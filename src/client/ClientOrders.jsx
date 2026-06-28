@@ -46,6 +46,7 @@ const statusColors = {
 };
 
 function ClientOrders() {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openDialog, setOpenDialog] = useState(false);
@@ -59,7 +60,7 @@ function ClientOrders() {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/orders', {
+            const response = await fetch(`${apiBaseUrl}/api/orders`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -82,7 +83,7 @@ function ClientOrders() {
     const handleDownloadPdf = async (orderId) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`/api/orders/${orderId}/pdf`, {
+            const response = await fetch(`${apiBaseUrl}/api/orders/${orderId}/pdf`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }

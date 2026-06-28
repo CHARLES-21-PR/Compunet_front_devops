@@ -60,6 +60,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function AdminCategories() {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -72,7 +73,7 @@ function AdminCategories() {
         setLoading(true);
         try {
             const authToken = localStorage.getItem('token');
-            const response = await fetch('/api/categories', {
+            const response = await fetch(`${apiBaseUrl}/api/categories`, {
                 headers: {
                     'Authorization': `Bearer ${authToken}`
                 }
@@ -111,7 +112,7 @@ function AdminCategories() {
 
     const handleSave = async () => {
         try {
-            const url = isEditing ? `/api/categories/${currentCategory.id}` : '/api/categories';
+            const url = isEditing ? `${apiBaseUrl}/api/categories/${currentCategory.id}` : `${apiBaseUrl}/api/categories`;
             const method = isEditing ? 'PUT' : 'POST';
             
             const authToken = localStorage.getItem('token');
@@ -150,7 +151,7 @@ function AdminCategories() {
 
         try {
             const authToken = localStorage.getItem('token');
-            const response = await fetch(`/api/categories/${id}`, {
+            const response = await fetch(`${apiBaseUrl}/api/categories/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${authToken}`

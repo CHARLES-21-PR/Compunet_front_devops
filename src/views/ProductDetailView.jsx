@@ -39,6 +39,7 @@ function ProductDetailView() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,7 +51,7 @@ function ProductDetailView() {
         const fetchProduct = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`/api/products/${id}`);
+                const response = await fetch(`${apiBaseUrl}/api/products/${id}`);
                 if (!response.ok) {
                     throw new Error('Producto no encontrado');
                 }
@@ -71,7 +72,7 @@ function ProductDetailView() {
         if (product) {
             const fetchRelated = async () => {
                 try {
-                    const response = await fetch('/api/products');
+                    const response = await fetch(`${apiBaseUrl}/api/products`);
                     if (response.ok) {
                         const data = await response.json();
                         const allProducts = Array.isArray(data) ? data : (data.data || []);
@@ -165,7 +166,7 @@ function ProductDetailView() {
                             >
                                 <Box 
                                     component="img"
-                                    src={product.image ? `http://localhost:8000/storage/products/${product.image}` : '/img/placeholder.png'}
+                                    src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
                                     alt={product.name}
                                     sx={{ 
                                         maxWidth: '100%', 
@@ -353,7 +354,7 @@ function ProductDetailView() {
                                         <Box sx={{ position: 'relative', pt: '100%', bgcolor: 'white' }}>
                                             <CardMedia
                                                 component="img"
-                                                image={related.image ? `http://localhost:8000/storage/products/${related.image}` : '/img/placeholder.png'}
+                                                image={related.image ? `${apiBaseUrl}/storage/products/${related.image}` : '/img/placeholder.png'}
                                                 alt={related.name}
                                                 sx={{ 
                                                     position: 'absolute', 
@@ -421,9 +422,9 @@ function ProductDetailView() {
                         <CloseIcon />
                     </IconButton>
                     {product && (
-                        <Box 
+                            <Box 
                             component="img"
-                            src={product.image ? `http://localhost:8000/storage/products/${product.image}` : '/img/placeholder.png'}
+                            src={product.image ? `${apiBaseUrl}/storage/products/${product.image}` : '/img/placeholder.png'}
                             alt={product.name}
                             sx={{
                                 maxWidth: '100%',

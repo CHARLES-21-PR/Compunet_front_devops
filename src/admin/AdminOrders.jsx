@@ -72,6 +72,7 @@ const statusColors = {
 function AdminOrders() {
     const location = useLocation();
     const navigate = useNavigate();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [exporting, setExporting] = useState(false);
@@ -94,7 +95,7 @@ function AdminOrders() {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('/api/orders', {
+            const response = await fetch(`${apiBaseUrl}/api/orders`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
@@ -130,7 +131,7 @@ function AdminOrders() {
             if (paymentMethodFilter !== 'all') params.append('payment_method', paymentMethodFilter);
             if (searchTerm) params.append('search', searchTerm);
 
-            const response = await fetch(`/api/orders/export?${params.toString()}`, {
+            const response = await fetch(`${apiBaseUrl}/api/orders/export?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -193,7 +194,7 @@ function AdminOrders() {
         } else {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/orders/${order.id}`, {
+                const response = await fetch(`${apiBaseUrl}/api/orders/${order.id}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (!response.ok) throw new Error('Error al cargar detalles');
@@ -219,7 +220,7 @@ function AdminOrders() {
     const handleSaveChanges = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`/api/orders/${currentOrder.id}`, {
+            const response = await fetch(`${apiBaseUrl}/api/orders/${currentOrder.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -245,7 +246,7 @@ function AdminOrders() {
         if (window.confirm(`¿Validar pago Yape para el pedido #${order.id}?`)) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/orders/${order.id}`, {
+                const response = await fetch(`${apiBaseUrl}/api/orders/${order.id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -271,7 +272,7 @@ function AdminOrders() {
         if (window.confirm('¿Estás seguro de eliminar este pedido?')) {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/orders/${id}`, {
+const response = await fetch(`${apiBaseUrl}/api/orders/${id}`, {
                     method: 'DELETE',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });

@@ -37,6 +37,7 @@ function CheckoutView() {
     const [activeStep, setActiveStep] = useState(0);
     const { checkoutItems, selectedTotal, clearCart } = useCart();
     const navigate = useNavigate();
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
 
     // Estados para el formulario
     const [billingData, setBillingData] = useState({
@@ -96,7 +97,7 @@ function CheckoutView() {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const response = await fetch('/api/orders', {
+            const response = await fetch(`${apiBaseUrl}/api/orders`, {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(orderData)

@@ -5,6 +5,7 @@ const CartContext = createContext();
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [cartItems, setCartItems] = useState(() => {
         const savedCart = localStorage.getItem('cart');
         return savedCart ? JSON.parse(savedCart) : [];
@@ -28,7 +29,7 @@ export const CartProvider = ({ children }) => {
                 image = product.image;
             } else {
                 // Asumimos que es una imagen del backend en storage
-                image = `http://localhost:8000/storage/products/${product.image}`;
+                image = `${apiBaseUrl}/storage/products/${product.image}`;
             }
         }
 

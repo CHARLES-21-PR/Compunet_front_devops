@@ -38,6 +38,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import AdminLayout from './AdminLayout';
 
 function AdminDashboard() {
+    const apiBaseUrl = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL;
     const [stats, setStats] = useState([
         { title: 'Ventas Hoy', value: 'S/ 0.00', icon: <TrendingUpIcon sx={{ fontSize: 40, color: '#0288d1' }} />, color: '#e1f5fe' },
         { title: 'Prod. Vendidos Hoy', value: '0', icon: <ShoppingCartIcon sx={{ fontSize: 40, color: '#ff9800' }} />, color: '#fff3e0' },
@@ -60,7 +61,7 @@ function AdminDashboard() {
         try {
             const token = localStorage.getItem('token');
             const queryParams = new URLSearchParams(filters).toString();
-            const response = await fetch(`/api/dashboard?${queryParams}`, {
+            const response = await fetch(`${apiBaseUrl}/api/dashboard?${queryParams}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             
