@@ -26,6 +26,7 @@ import CheckoutView from './views/CheckoutView.jsx'
 import { AuthProvider } from './context/AuthContext'
 import { CartProvider } from './context/CartContext'
 import WhatsAppFloat from './components/WhatsAppFloat.jsx';
+import ChatSupport from './components/ChatSupport.jsx';
 
 function App() {
   const location = useLocation();
@@ -56,6 +57,7 @@ function App() {
           <Route path="/admin/users" element={<AdminUsers />} />
         </Routes>
         {!isAdminRoute && <WhatsAppFloat />}
+        {!isAdminRoute && <ChatSupport />}
         {!isAdminRoute && <Footer />}
       </CartProvider>
     </AuthProvider>
